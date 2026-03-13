@@ -13,17 +13,22 @@ let thePass;
 
 
 try {
-    const local = require("./config.locals.cjs"); //Le decimos donde estan las variables
-    theUser = local.USER; //Las asignamos a las variables globales "theUser"
+    const local = require("./config.locals.cjs"); 
+    theUser = local.USER; 
     thePass = local.PASSWORD;
-} catch (error) {    
+    
+} catch (error) {   
+  console.error("Error al cargar config.locals.cjs: ", error.message) 
 }
 
+
+
+
 const connection  = await mysql.createConnection({
-  host: "srv1293.hstgr.io", //info proporcionada por hostinger
-  user: theUser, //info proporcionada por hostinger
-  database: "u354636099_test1", //info proporcionada por hostinger
-  password: thePass, //! NO SE SUBE
+  host: "srv1293.hstgr.io", 
+  user: theUser, 
+  database: "u354636099_test1", 
+  password: thePass, 
 })
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,19 +36,18 @@ app.use(express.static("public"));
 
 let items = [
   { id: 1, title: "Buy milk" },
-  { id: 2, title: "Finish homework" },
+  { id: 2, title: "Finish homeworkLocal" },
 ];
 
+async function getItems() {
+  const result = await connection.query("SELECT * FROM items");
+  items = result[0];
+  return items;
+}
+
 app.get("/", async (req, res) => {
-  try {
-    const [result, fields] = await connection.query("SELECT * FROM items")
-    console.log(result)
-    console.log("...")
-    console.log(fields)
-  } catch(err){
-    console.log(err);
-  }
- 
+  let currentItems = await getItems();
+  console.log(currentItems);
   res.render("index.ejs", {
     listTitle: "Today",
     listItems: items,
@@ -51,9 +55,9 @@ app.get("/", async (req, res) => {
   
 });
 
-app.post("/add", (req, res) => {
+app.post("/add", async(req, res) => {
   const item = req.body.newItem;
-  items.push({ title: item });
+  await connection.query("INSERT INTO items (title) VALUES ($1)", [item]);
   res.redirect("/");
 });
 
