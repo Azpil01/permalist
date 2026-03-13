@@ -57,7 +57,13 @@ app.get("/", async (req, res) => {
 
 app.post("/add", async(req, res) => {
   const item = req.body.newItem;
-  await connection.query("INSERT INTO items (title) VALUES ($1)", [item]);
+  console.log(item)
+  try {
+    await connection.query("INSERT INTO items (title) VALUES (?)", [item]); //El símbolo para MySQL es ?
+  } catch (err) {
+    console.error("Error tryng to INSERT INTO ", err);
+    res.status(500).send("Error al guardar el item");
+  }
   res.redirect("/");
 });
 
