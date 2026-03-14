@@ -67,7 +67,11 @@ app.post("/add", async(req, res) => {
   res.redirect("/");
 });
 
-app.post("/edit", (req, res) => {});
+app.post("/edit", (req, res) => {
+  const newTitleId = req.body.updatedItemId;
+  const newTitle = req.body.updatedItemTitle;
+
+});
 
 app.post("/delete", (req, res) => {});
 
