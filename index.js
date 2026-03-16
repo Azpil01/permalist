@@ -67,9 +67,18 @@ app.post("/add", async(req, res) => {
   res.redirect("/");
 });
 
-app.post("/edit", (req, res) => {
-  const newTitleId = req.body.updatedItemId;
+app.post("/edit", async (req, res) => {
+  const idToBeUpdated = req.body.updatedItemId;
   const newTitle = req.body.updatedItemTitle;
+
+  try {
+    await connection.query("UPDATE items SET title = (?) WHERE id = (?)", [newTitle, idToBeUpdated])
+    console.log(`ID ${idToBeUpdated} has been updated`)
+    
+  } catch (err) {
+    console.error("Error trying to updete the item with id: " + idToBeUpdated, err )
+  }
+  res.redirect("/");
   
 
 });
