@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import mysql from "mysql2/promise"
 import { createRequire } from "node:module";
+import { connect } from "node:http2";
 
 const app = express();
 const port = 3000;
@@ -10,7 +11,6 @@ const require = createRequire(import.meta.url);
 
 let theUser;
 let thePass;
-
 
 try {
     const local = require("./config.locals.cjs"); 
@@ -56,10 +56,10 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/add", async(req, res) => {
-  const item = req.body.newItem;
-  console.log(item)
+  const item = req.body.newItem;  
   try {
     await connection.query("INSERT INTO items (title) VALUES (?)", [item]); //El símbolo para MySQL es ?
+    console.log(item)
   } catch (err) {
     console.error("Error tryng to INSERT INTO ", err);
     res.status(500).send("Error al guardar el item");
@@ -70,10 +70,22 @@ app.post("/add", async(req, res) => {
 app.post("/edit", (req, res) => {
   const newTitleId = req.body.updatedItemId;
   const newTitle = req.body.updatedItemTitle;
+  
 
 });
 
-app.post("/delete", (req, res) => {});
+app.post("/delete", async(req, res) => {
+  const titleId = req.body.deleteItemId
+  console.log(`Item to be deleted: ${titleId}`);
+  try {
+    await connection.query("DELETE FROM items WHERE id = (?)", titleId);
+    console.log("Item deleted")
+  } catch (err) {
+    console.error("Error trying to delete the item: " + titleId, err )
+  }
+  res.redirect("/");
+
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}, Azpil`);
