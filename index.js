@@ -40,7 +40,7 @@ let items = [
 ];
 
 async function getItems() {
-  const result = await connection.query("SELECT * FROM items");
+  const result = await connection.query("SELECT * FROM items ORDER BY id ASC");
   items = result[0];
   return items;
 }
