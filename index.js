@@ -57,6 +57,10 @@ app.get("/", async (req, res) => {
 
 app.post("/add", async(req, res) => {
   const item = req.body.newItem;  
+  if (!item || item.trim().length === 0) {
+    console.log("Input is required");
+    return res.redirect("/");
+  }
   try {
     await connection.query("INSERT INTO items (title) VALUES (?)", [item]); //El símbolo para MySQL es ?
     console.log(item)
